@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 zbus = "3.14.1"
+log = { version = "0.4.20", features = ["std"] }
+simple_logger = "4.3.0"
+time = "0.3.30"
