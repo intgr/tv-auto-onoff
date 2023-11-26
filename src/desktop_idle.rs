@@ -1,5 +1,6 @@
 use std::error::Error;
 
+use crate::bravia::BraviaClient;
 use log::debug;
 use zbus::export::ordered_stream::OrderedStreamExt;
 use zbus::{dbus_proxy, Connection};
@@ -20,7 +21,7 @@ trait ScreenSaver {
 /**
  * Monitor D-Bus ScreenSaver for activation/deactivation.
  */
-pub async fn desktop_idle() -> Result<(), Box<dyn Error>> {
+pub async fn desktop_idle(tv: BraviaClient) -> Result<(), Box<dyn Error>> {
     let connection = Connection::session().await?;
 
     // https://dbus2.github.io/zbus/client.html#signals
@@ -30,6 +31,7 @@ pub async fn desktop_idle() -> Result<(), Box<dyn Error>> {
     while let Some(msg) = changes_stream.next().await {
         let new_value: bool = msg.body()?;
         debug!("ScreenSaver active: {:?}", new_value);
+        tv.picture_mute_handled(new_value)
     }
 
     // TODO should be error?

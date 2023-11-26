@@ -1,7 +1,12 @@
+mod bravia;
 mod desktop_idle;
 
 use crate::desktop_idle::desktop_idle;
+use std::env;
+use std::net::IpAddr;
+use std::str::FromStr;
 
+use crate::bravia::BraviaClient;
 use futures::executor;
 use log::{debug, LevelFilter};
 use simple_logger::SimpleLogger;
@@ -25,5 +30,13 @@ fn main() {
 
     debug!("{} {} starting...", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 
-    executor::block_on(desktop_idle()).expect("Error from D-Bus ScreenSaver monitor");
+    // Set up BraviaClient
+    // TODO better CLI handling
+    let args: Vec<String> = env::args().collect();
+    let ip_str = args.get(1).expect("Provide Bravia IP address as argument");
+    let ip = IpAddr::from_str(ip_str).expect("Invalid IP address");
+    let tv = BraviaClient::new(ip);
+
+    // TODO Loosen coupling between desktop_idle and BraviaClient
+    executor::block_on(desktop_idle(tv)).expect("Error from D-Bus ScreenSaver monitor");
 }
