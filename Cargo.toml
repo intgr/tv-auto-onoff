@@ -9,4 +9,5 @@ edition = "2021"
 zbus = "3.14.1"
 log = { version = "0.4.20", features = ["std"] }
 simple_logger = "4.3.0"
-time = "0.3.30"
+time = { version = "0.3.30", features = ["local-offset"] }
+futures = "0.3.29"
