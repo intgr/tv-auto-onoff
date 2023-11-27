@@ -27,6 +27,12 @@ impl BraviaClient {
         self.send_command(cmd)
     }
 
+    // setPowerStatus
+    pub fn set_power_status(&mut self, active: bool) -> Result<(), Box<dyn Error>> {
+        let cmd = if active { "*SCPOWR0000000000000001\n" } else { "*SCPOWR0000000000000000\n" };
+        self.send_command(cmd)
+    }
+
     fn send_command(&mut self, command: &str) -> Result<(), Box<dyn Error>> {
         debug!("Sending Bravia command: {}", command.trim());
         self.conn.write_all(command.as_bytes())?;

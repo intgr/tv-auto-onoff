@@ -19,6 +19,7 @@ impl TvManager {
 
     fn turn_on_internal(&self) -> Result<(), Box<dyn Error>> {
         let mut bravia = self.connect()?;
+        bravia.set_power_status(true)?;
         bravia.set_picture_mute(false)?;
         Ok(())
     }
