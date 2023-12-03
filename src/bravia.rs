@@ -82,8 +82,10 @@ impl BraviaClient {
     }
 
     fn send_command(&mut self, command: &str) -> Result<(), BoxError> {
-        self.transact(command)?;
-        // TODO handle error response from TV
+        let result = self.transact(command)?;
+        if result.ends_with("FFFFFFFFFFFFFFFF") {
+            bail!("Protocol error: Error response: {result}")
+        }
         Ok(())
     }
 }
