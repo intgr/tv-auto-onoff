@@ -1,16 +1,19 @@
 use std::env;
+use std::iter::Iterator;
 use std::net::IpAddr;
 use std::str::FromStr;
 
 use futures::executor;
+use futures::StreamExt;
 use log::{debug, LevelFilter};
 use simple_logger::SimpleLogger;
 use time::macros::format_description;
 use time::util::local_offset;
 use time::util::local_offset::Soundness;
 
-use crate::desktop_idle::desktop_idle;
+use crate::desktop_idle::{desktop_events, DesktopEvent};
 use crate::tv_manager::TvManager;
+use crate::util::BoxError;
 
 mod bravia;
 mod desktop_idle;
@@ -40,6 +43,25 @@ fn main() {
     let ip = IpAddr::from_str(ip_str).expect("Invalid IP address");
     let tv = TvManager::new(ip);
 
-    // TODO Loosen coupling between desktop_idle and BraviaClient
-    executor::block_on(desktop_idle(tv)).expect("Error from D-Bus ScreenSaver monitor");
+    executor::block_on(main_loop(tv)).expect("Error running main loop");
+}
+
+async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
+    let mut idle_monitor = desktop_events()
+        .await
+        .expect("Error monitoring desktop events on D-Bus");
+
+    while let Some(event) = idle_monitor.next().await {
+        let DesktopEvent::ScreenSaver(blanked) = event;
+        debug!("ScreenSaver active: {:?}", blanked);
+
+        if blanked {
+            tv.turn_off();
+        } else {
+            tv.turn_on();
+        }
+    }
+
+    // TODO should be error?
+    Ok(())
 }

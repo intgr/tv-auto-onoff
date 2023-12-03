@@ -1,8 +1,8 @@
-use crate::tv_manager::TvManager;
-use crate::util::BoxError;
-use log::debug;
-use zbus::export::ordered_stream::OrderedStreamExt;
+use futures::Stream;
+use futures::StreamExt;
 use zbus::{dbus_proxy, Connection};
+
+use crate::util::BoxError;
 
 // https://docs.rs/zbus/latest/zbus/attr.dbus_proxy.html
 // TODO try org.freedesktop.ScreenSaver?
@@ -17,26 +17,23 @@ trait ScreenSaver {
     fn active_changed(&self, new_value: bool) -> fdo::Result<()>;
 }
 
+#[derive(Clone)]
+pub enum DesktopEvent {
+    ScreenSaver(bool),
+}
+
 /**
  * Monitor D-Bus ScreenSaver for activation/deactivation.
  */
-pub async fn desktop_idle(tv: TvManager) -> Result<(), BoxError> {
+pub async fn desktop_events() -> Result<impl Stream<Item = DesktopEvent>, BoxError> {
     let connection = Connection::session().await?;
 
     // https://dbus2.github.io/zbus/client.html#signals
     let screen_saver = ScreenSaverProxy::new(&connection).await?;
-    let mut changes_stream = screen_saver.receive_active_changed().await?;
+    let changes_stream = screen_saver.receive_active_changed().await?;
 
-    while let Some(msg) = changes_stream.next().await {
-        let new_value: bool = msg.body()?;
-        debug!("ScreenSaver active: {:?}", new_value);
-        if new_value {
-            tv.turn_off();
-        } else {
-            tv.turn_on();
-        }
-    }
-
-    // TODO should be error?
-    Ok(())
+    Ok(changes_stream.map(|msg| {
+        let new_value: bool = msg.body().expect("Unexpected message from D-Bus");
+        DesktopEvent::ScreenSaver(new_value)
+    }))
 }
