@@ -45,4 +45,18 @@ impl TvManager {
         }
         info!("TV turned off")
     }
+
+    fn keepalive_internal(&self) -> Result<(), BoxError> {
+        let mut bravia = self.connect()?;
+        // XXX is this enough to keep screen alive?
+        bravia.get_input()?;
+        Ok(())
+    }
+
+    pub fn keepalive(&self) {
+        if let Err(e) = self.keepalive_internal() {
+            error!("Error sending keep-alive ping: {e}")
+        }
+        info!("Keep-alive sent")
+    }
 }

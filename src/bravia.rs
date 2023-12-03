@@ -1,8 +1,9 @@
 use std::io::{BufRead, BufReader, Write};
 use std::net::{IpAddr, TcpStream};
 
-use crate::util::BoxError;
 use log::debug;
+
+use crate::util::BoxError;
 
 pub struct BraviaClient {
     conn: TcpStream,
@@ -31,6 +32,10 @@ impl BraviaClient {
     pub fn set_power_status(&mut self, active: bool) -> Result<(), BoxError> {
         let cmd = if active { "*SCPOWR0000000000000001\n" } else { "*SCPOWR0000000000000000\n" };
         self.send_command(cmd)
+    }
+
+    pub fn get_input(&mut self) -> Result<(), BoxError> {
+        self.send_command("*SEINPT################\n")
     }
 
     fn send_command(&mut self, command: &str) -> Result<(), BoxError> {

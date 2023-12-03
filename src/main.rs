@@ -3,15 +3,17 @@ use std::iter::Iterator;
 use std::net::IpAddr;
 use std::str::FromStr;
 
-use futures::executor;
 use futures::StreamExt;
+use futures::{executor, select};
+use futures_time::stream::interval;
+use futures_time::time::Duration;
 use log::{debug, LevelFilter};
 use simple_logger::SimpleLogger;
 use time::macros::format_description;
 use time::util::local_offset;
 use time::util::local_offset::Soundness;
 
-use crate::desktop_idle::{desktop_events, DesktopEvent};
+use crate::desktop_idle::desktop_events;
 use crate::tv_manager::TvManager;
 use crate::util::BoxError;
 
@@ -46,19 +48,41 @@ fn main() {
     executor::block_on(main_loop(tv)).expect("Error running main loop");
 }
 
+pub enum LoopEvent {
+    ScreenSaver(bool),
+    Keepalive,
+}
+
+/// Ping TV every 10 minutes.
+const KEEPALIVE_INTERVAL: u64 = 600;
+
 async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
+    let mut keepalive_ping = interval(Duration::from_secs(KEEPALIVE_INTERVAL)).fuse();
     let mut idle_monitor = desktop_events()
         .await
-        .expect("Error monitoring desktop events on D-Bus");
+        .expect("Error monitoring desktop events on D-Bus")
+        .fuse();
 
-    while let Some(event) = idle_monitor.next().await {
-        let DesktopEvent::ScreenSaver(blanked) = event;
-        debug!("ScreenSaver active: {:?}", blanked);
+    loop {
+        let item = select! {
+            item = idle_monitor.next() => item,
+            _item = keepalive_ping.next() => Some(LoopEvent::Keepalive),
+        };
 
-        if blanked {
-            tv.turn_off();
-        } else {
-            tv.turn_on();
+        match item {
+            Some(LoopEvent::ScreenSaver(blanked)) => {
+                debug!("ScreenSaver active: {:?}", blanked);
+                if blanked {
+                    tv.turn_off();
+                } else {
+                    tv.turn_on();
+                }
+            }
+            Some(LoopEvent::Keepalive) => {
+                debug!("Keep-alive");
+                tv.keepalive();
+            }
+            None => break,
         }
     }
 

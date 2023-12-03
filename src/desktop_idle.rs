@@ -3,6 +3,7 @@ use futures::StreamExt;
 use zbus::{dbus_proxy, Connection};
 
 use crate::util::BoxError;
+use crate::LoopEvent;
 
 // https://docs.rs/zbus/latest/zbus/attr.dbus_proxy.html
 // TODO try org.freedesktop.ScreenSaver?
@@ -17,15 +18,10 @@ trait ScreenSaver {
     fn active_changed(&self, new_value: bool) -> fdo::Result<()>;
 }
 
-#[derive(Clone)]
-pub enum DesktopEvent {
-    ScreenSaver(bool),
-}
-
 /**
  * Monitor D-Bus ScreenSaver for activation/deactivation.
  */
-pub async fn desktop_events() -> Result<impl Stream<Item = DesktopEvent>, BoxError> {
+pub async fn desktop_events() -> Result<impl Stream<Item = LoopEvent>, BoxError> {
     let connection = Connection::session().await?;
 
     // https://dbus2.github.io/zbus/client.html#signals
@@ -34,6 +30,6 @@ pub async fn desktop_events() -> Result<impl Stream<Item = DesktopEvent>, BoxErr
 
     Ok(changes_stream.map(|msg| {
         let new_value: bool = msg.body().expect("Unexpected message from D-Bus");
-        DesktopEvent::ScreenSaver(new_value)
+        LoopEvent::ScreenSaver(new_value)
     }))
 }
