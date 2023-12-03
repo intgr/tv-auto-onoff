@@ -12,3 +12,4 @@ simple_logger = "4.3.0"
 time = { version = "0.3.30", features = ["local-offset"] }
 futures = "0.3.29"
 futures-time = "3.0.0"
+simple-error = "0.3.0"

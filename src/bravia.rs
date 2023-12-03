@@ -2,6 +2,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::net::{IpAddr, TcpStream};
 
 use log::debug;
+use simple_error::bail;
 
 use crate::util::BoxError;
 
@@ -34,17 +35,55 @@ impl BraviaClient {
         self.send_command(cmd)
     }
 
-    pub fn get_input(&mut self) -> Result<(), BoxError> {
-        self.send_command("*SEINPT################\n")
+    // getPictureMute
+    pub fn get_picture_mute(&mut self) -> Result<bool, BoxError> {
+        let result = self.transact("*SEPMUT################\n")?;
+        if result == "*SAPMUT0000000000000000" {
+            return Ok(false);
+        } else if result == "*SAPMUT0000000000000001" {
+            return Ok(true);
+        }
+        bail!("Protocol error: Unexpected getPictureMute response: {result}");
     }
 
-    fn send_command(&mut self, command: &str) -> Result<(), BoxError> {
+    fn transact(&mut self, command: &str) -> Result<String, BoxError> {
         debug!("Sending Bravia command: {}", command.trim());
         self.conn.write_all(command.as_bytes())?;
 
-        let mut result = String::new();
-        BufReader::new(&self.conn).read_line(&mut result)?;
-        debug!("TV response: {}", result.trim());
+        let mut reader = BufReader::new(&self.conn);
+        loop {
+            let mut result = String::new();
+            // XXX no timeout
+            reader.read_line(&mut result)?;
+            let maybe_slice = result.strip_suffix('\n');
+
+            if maybe_slice.is_none() {
+                // EOF hit without newline.
+                bail!(
+                    "Protocol error: Connection closed without complete response (got {} bytes)",
+                    result.len()
+                );
+            }
+            let slice = maybe_slice.unwrap();
+            if slice.len() != 23 {
+                bail!("Protocol error: Unexpected response length {} bytes", slice.len())
+            }
+            if result.starts_with("*SN") {
+                // Ignore async notifications, they're not the reply to the command. Loop back again.
+                debug!("Bravia asynchronous notification: {slice}")
+            } else if result.starts_with("*SA") {
+                // We assume this is reply to the command, without checking deeper.
+                debug!("Received Bravia response: {slice}");
+                return Ok(slice.to_string());
+            } else {
+                bail!("Protocol error: Unrecognized response packet: {slice}")
+            }
+        }
+    }
+
+    fn send_command(&mut self, command: &str) -> Result<(), BoxError> {
+        self.transact(command)?;
+        // TODO handle error response from TV
         Ok(())
     }
 }

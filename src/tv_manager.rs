@@ -48,11 +48,14 @@ impl TvManager {
 
     fn keepalive_internal(&self) -> Result<(), BoxError> {
         let mut bravia = self.connect()?;
-        // XXX is this enough to keep screen alive?
-        bravia.get_input()?;
+        // Calling setPictureMute resets the sleep timer. But we need to know current status to avoid changing it.
+        // XXX Apparenty getPictureMute can give incorrect results if we call it too quickly.
+        let muted = bravia.get_picture_mute()?;
+        bravia.set_picture_mute(muted)?;
         Ok(())
     }
 
+    /// Reset TV sleep timer (called periodically)
     pub fn keepalive(&self) {
         if let Err(e) = self.keepalive_internal() {
             error!("Error sending keep-alive ping: {e}")
