@@ -19,8 +19,9 @@ impl TvManager {
 
     fn turn_on_internal(&self) -> Result<(), Box<dyn Error>> {
         let mut bravia = self.connect()?;
-        bravia.set_power_status(true)?;
+        // This ordering is significant, opposite order sometimes results in blank screen.
         bravia.set_picture_mute(false)?;
+        bravia.set_power_status(true)?;
         Ok(())
     }
 
