@@ -15,6 +15,7 @@ use crate::tv_manager::TvManager;
 mod bravia;
 mod desktop_idle;
 mod tv_manager;
+mod util;
 
 fn main() {
     // time-rs is silly...

@@ -1,8 +1,9 @@
-use log::{error, info};
-use std::error::Error;
 use std::net::IpAddr;
 
+use log::{error, info};
+
 use crate::bravia::BraviaClient;
+use crate::util::BoxError;
 
 pub struct TvManager {
     ip: IpAddr,
@@ -13,11 +14,11 @@ impl TvManager {
         TvManager { ip }
     }
 
-    fn connect(&self) -> Result<BraviaClient, Box<dyn Error>> {
+    fn connect(&self) -> Result<BraviaClient, BoxError> {
         BraviaClient::new(self.ip)
     }
 
-    fn turn_on_internal(&self) -> Result<(), Box<dyn Error>> {
+    fn turn_on_internal(&self) -> Result<(), BoxError> {
         let mut bravia = self.connect()?;
         // This ordering is significant, opposite order sometimes results in blank screen.
         bravia.set_picture_mute(false)?;
@@ -32,7 +33,7 @@ impl TvManager {
         info!("TV turned on")
     }
 
-    fn turn_off_internal(&self) -> Result<(), Box<dyn Error>> {
+    fn turn_off_internal(&self) -> Result<(), BoxError> {
         let mut bravia = self.connect()?;
         bravia.set_picture_mute(true)?;
         Ok(())

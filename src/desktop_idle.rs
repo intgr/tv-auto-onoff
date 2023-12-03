@@ -1,10 +1,8 @@
-use std::error::Error;
-
+use crate::tv_manager::TvManager;
+use crate::util::BoxError;
 use log::debug;
 use zbus::export::ordered_stream::OrderedStreamExt;
 use zbus::{dbus_proxy, Connection};
-
-use crate::tv_manager::TvManager;
 
 // https://docs.rs/zbus/latest/zbus/attr.dbus_proxy.html
 // TODO try org.freedesktop.ScreenSaver?
@@ -22,7 +20,7 @@ trait ScreenSaver {
 /**
  * Monitor D-Bus ScreenSaver for activation/deactivation.
  */
-pub async fn desktop_idle(tv: TvManager) -> Result<(), Box<dyn Error>> {
+pub async fn desktop_idle(tv: TvManager) -> Result<(), BoxError> {
     let connection = Connection::session().await?;
 
     // https://dbus2.github.io/zbus/client.html#signals
