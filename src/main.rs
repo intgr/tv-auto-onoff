@@ -62,6 +62,7 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
         .await
         .expect("Error monitoring desktop events on D-Bus")
         .fuse();
+    let mut current_blanked = false;
 
     loop {
         let item = select! {
@@ -77,10 +78,15 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
                 } else {
                     tv.turn_on();
                 }
+                current_blanked = blanked
             }
             Some(LoopEvent::Keepalive) => {
-                debug!("Keep-alive");
-                tv.keepalive();
+                if !current_blanked {
+                    debug!("Keep-alive");
+                    tv.keepalive();
+                } else {
+                    debug!("Skipping keep-alive while blanked")
+                }
             }
             None => break,
         }
