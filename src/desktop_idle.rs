@@ -41,7 +41,7 @@ pub async fn desktop_events() -> Result<impl Stream<Item = LoopEvent>, BoxError>
             0 => LoopEvent::ScreenSaver(false),
             1..=3 => LoopEvent::ScreenSaver(true),
             _ => {
-                warn!("Unknown PowerSaveMode: {value}");
+                warn!("Unknown PowerSaveMode: {value}; ignoring");
                 LoopEvent::Noop
             }
         }
