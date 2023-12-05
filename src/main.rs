@@ -1,6 +1,7 @@
 use std::env;
 use std::iter::Iterator;
 use std::net::IpAddr;
+use std::pin::pin;
 use std::str::FromStr;
 
 use futures::StreamExt;
@@ -51,6 +52,7 @@ fn main() {
 pub enum LoopEvent {
     ScreenSaver(bool),
     Keepalive,
+    Noop,
 }
 
 /// Ping TV every 10 minutes.
@@ -58,10 +60,10 @@ const KEEPALIVE_INTERVAL: u64 = 600;
 
 async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
     let mut keepalive_ping = interval(Duration::from_secs(KEEPALIVE_INTERVAL)).fuse();
-    let mut idle_monitor = desktop_events()
+    let mut idle_monitor = pin!(desktop_events()
         .await
         .expect("Error monitoring desktop events on D-Bus")
-        .fuse();
+        .fuse());
     let mut current_blanked = false;
 
     loop {
@@ -88,6 +90,7 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
                     debug!("Skipping keep-alive while blanked")
                 }
             }
+            Some(LoopEvent::Noop) => {}
             None => break,
         }
     }
