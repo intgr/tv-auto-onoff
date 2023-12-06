@@ -6,6 +6,7 @@ edition = "2021"
 # Metadata
 authors = ["Marti Raudsepp <marti@juffo.org>"]
 description = "Automatically power on/off TV like a computer display"
+license = "MIT"
 homepage = "https://github.com/intgr/tv-auto-onoff"
 repository = "https://github.com/intgr/tv-auto-onoff"
 keywords = ["sony", "tv", "screensaver", "gnome", "daemon"]
