@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/bravia-tv-screensaver.iml" filepath="$PROJECT_DIR$/.idea/bravia-tv-screensaver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/tv-auto-onoff.iml" filepath="$PROJECT_DIR$/.idea/tv-auto-onoff.iml" />
     </modules>
   </component>
 </project>

@@ -1,15 +1,23 @@
 [package]
-name = "bravia-tv-screensaver"
+name = "tv-auto-onoff"
 version = "0.0.0"
 edition = "2021"
+
+# Metadata
+authors = ["Marti Raudsepp <marti@juffo.org>"]
+description = "Automatically power on/off TV like a computer display"
+homepage = "https://github.com/intgr/tv-auto-onoff"
+repository = "https://github.com/intgr/tv-auto-onoff"
+keywords = ["sony", "tv", "screensaver", "gnome", "daemon"]
+categories = ["accessibility"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zbus = "3.14.1"
-log = { version = "0.4.20", features = ["std"] }
-simple_logger = "4.3.0"
-time = { version = "0.3.30", features = ["local-offset"] }
 futures = "0.3.29"
 futures-time = "3.0.0"
+log = { version = "0.4.20", features = ["std"] }
 simple-error = "0.3.0"
+simple_logger = "4.3.0"
+time = { version = "0.3.30", features = ["local-offset"] }
+zbus = "3.14.1"
