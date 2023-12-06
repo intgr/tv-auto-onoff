@@ -64,7 +64,7 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
         .await
         .expect("Error monitoring desktop events on D-Bus")
         .fuse());
-    let mut current_blanked = false;
+    let mut current_blanked: Option<bool> = None;
 
     loop {
         let item = select! {
@@ -74,16 +74,20 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
 
         match item {
             Some(LoopEvent::ScreenSaver(blanked)) => {
-                debug!("ScreenSaver active: {:?}", blanked);
+                if current_blanked == Some(blanked) {
+                    continue; // Nothing changed
+                }
+                current_blanked = Some(blanked);
+
+                debug!("Screen blanked: {:?}", blanked);
                 if blanked {
                     tv.turn_off();
                 } else {
                     tv.turn_on();
                 }
-                current_blanked = blanked
             }
             Some(LoopEvent::Keepalive) => {
-                if !current_blanked {
+                if current_blanked == Some(false) {
                     debug!("Keep-alive");
                     tv.keepalive();
                 } else {
