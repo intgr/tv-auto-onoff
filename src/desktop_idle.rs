@@ -18,9 +18,7 @@ trait DisplayConfig {
     fn power_save_mode(&self) -> zbus::Result<i32>;
 }
 
-/**
- * Monitor D-Bus org.gnome.Mutter.DisplayConfig PowerSaveMode property changes.
- */
+/// Monitor D-Bus `org.gnome.Mutter.DisplayConfig` property `PowerSaveMode` changes.
 pub async fn desktop_events() -> Result<impl Stream<Item = LoopEvent>, BoxError> {
     let connection = Connection::session().await?;
 

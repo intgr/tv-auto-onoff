@@ -13,10 +13,8 @@ pub struct BraviaClient {
 // Port number used for Simple IP control.
 const DEFAULT_PORT: u16 = 20060;
 
-/**
- * Client for Bravia "Simple IP control" protocol
- * https://pro-bravia.sony.net/develop/integrate/ssip/command-definitions/index.html
- */
+/// Client for Bravia "Simple IP control" protocol
+/// https://pro-bravia.sony.net/develop/integrate/ssip/command-definitions/index.html
 impl BraviaClient {
     pub fn new(ip: IpAddr) -> Result<Self, BoxError> {
         let conn = TcpStream::connect((ip, DEFAULT_PORT))?;
