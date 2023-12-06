@@ -1,3 +1,5 @@
+#![warn(clippy::pedantic)]
+
 use std::env;
 use std::iter::Iterator;
 use std::net::IpAddr;
@@ -91,7 +93,7 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
                     trace!("Keep-alive");
                     tv.keepalive();
                 } else {
-                    debug!("Skipping keep-alive while blanked")
+                    debug!("Skipping keep-alive while blanked");
                 }
             }
             Some(LoopEvent::Noop) => {}

@@ -28,9 +28,9 @@ impl TvManager {
 
     pub fn turn_on(&self) {
         if let Err(e) = self.turn_on_internal() {
-            error!("Error turning on TV: {e}")
+            error!("Error turning on TV: {e}");
         }
-        info!("TV turned on")
+        info!("TV turned on");
     }
 
     fn turn_off_internal(&self) -> Result<(), BoxError> {
@@ -41,9 +41,9 @@ impl TvManager {
 
     pub fn turn_off(&self) {
         if let Err(e) = self.turn_off_internal() {
-            error!("Error turning off TV: {e}")
+            error!("Error turning off TV: {e}");
         }
-        info!("TV turned off")
+        info!("TV turned off");
     }
 
     fn keepalive_internal(&self) -> Result<(), BoxError> {
@@ -58,8 +58,8 @@ impl TvManager {
     /// Reset TV sleep timer (called periodically)
     pub fn keepalive(&self) {
         if let Err(e) = self.keepalive_internal() {
-            error!("Error sending keep-alive ping: {e}")
+            error!("Error sending keep-alive ping: {e}");
         }
-        info!("Keep-alive sent")
+        info!("Keep-alive sent");
     }
 }

@@ -6,6 +6,7 @@ use simple_error::bail;
 
 use crate::util::BoxError;
 
+#[allow(clippy::module_name_repetitions)]
 pub struct BraviaClient {
     conn: TcpStream,
 }
@@ -14,7 +15,7 @@ pub struct BraviaClient {
 const DEFAULT_PORT: u16 = 20060;
 
 /// Client for Bravia "Simple IP control" protocol
-/// https://pro-bravia.sony.net/develop/integrate/ssip/command-definitions/index.html
+/// <https://pro-bravia.sony.net/develop/integrate/ssip/command-definitions/index.html>
 impl BraviaClient {
     pub fn new(ip: IpAddr) -> Result<Self, BoxError> {
         let conn = TcpStream::connect((ip, DEFAULT_PORT))?;
@@ -64,17 +65,17 @@ impl BraviaClient {
             }
             let slice = maybe_slice.unwrap();
             if slice.len() != 23 {
-                bail!("Protocol error: Unexpected response length {} bytes", slice.len())
+                bail!("Protocol error: Unexpected response length {} bytes", slice.len());
             }
             if result.starts_with("*SN") {
                 // Ignore async notifications, they're not the reply to the command. Loop back again.
-                debug!("Bravia asynchronous notification: {slice}")
+                debug!("Bravia asynchronous notification: {slice}");
             } else if result.starts_with("*SA") {
                 // We assume this is reply to the command, without checking deeper.
                 trace!("Received Bravia response: {slice}");
                 return Ok(slice.to_string());
             } else {
-                bail!("Protocol error: Unrecognized response packet: {slice}")
+                bail!("Protocol error: Unrecognized response packet: {slice}");
             }
         }
     }
