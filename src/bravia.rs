@@ -1,7 +1,7 @@
 use std::io::{BufRead, BufReader, Write};
 use std::net::{IpAddr, TcpStream};
 
-use log::debug;
+use log::{debug, trace};
 use simple_error::bail;
 
 use crate::util::BoxError;
@@ -45,7 +45,7 @@ impl BraviaClient {
     }
 
     fn transact(&mut self, command: &str) -> Result<String, BoxError> {
-        debug!("Sending Bravia command: {}", command.trim());
+        trace!("Sending Bravia command: {}", command.trim_end());
         self.conn.write_all(command.as_bytes())?;
 
         let mut reader = BufReader::new(&self.conn);
@@ -71,7 +71,7 @@ impl BraviaClient {
                 debug!("Bravia asynchronous notification: {slice}")
             } else if result.starts_with("*SA") {
                 // We assume this is reply to the command, without checking deeper.
-                debug!("Received Bravia response: {slice}");
+                trace!("Received Bravia response: {slice}");
                 return Ok(slice.to_string());
             } else {
                 bail!("Protocol error: Unrecognized response packet: {slice}")
@@ -82,7 +82,7 @@ impl BraviaClient {
     fn send_command(&mut self, command: &str) -> Result<(), BoxError> {
         let result = self.transact(command)?;
         if result.ends_with("FFFFFFFFFFFFFFFF") {
-            bail!("Protocol error: Error response: {result}")
+            bail!("Protocol error: Command {} error result: {result}", command.trim_end());
         }
         Ok(())
     }

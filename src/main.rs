@@ -8,7 +8,7 @@ use futures::StreamExt;
 use futures::{executor, select};
 use futures_time::stream::interval;
 use futures_time::time::Duration;
-use log::{debug, LevelFilter};
+use log::{debug, trace, LevelFilter};
 use simple_logger::SimpleLogger;
 use time::macros::format_description;
 use time::util::local_offset;
@@ -88,7 +88,7 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
             }
             Some(LoopEvent::Keepalive) => {
                 if current_blanked == Some(false) {
-                    debug!("Keep-alive");
+                    trace!("Keep-alive");
                     tv.keepalive();
                 } else {
                     debug!("Skipping keep-alive while blanked")

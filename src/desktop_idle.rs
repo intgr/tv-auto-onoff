@@ -1,6 +1,6 @@
 use futures::Stream;
 use futures::StreamExt;
-use log::{debug, warn};
+use log::{trace, warn};
 use zbus::{dbus_proxy, Connection};
 
 use crate::util::BoxError;
@@ -27,7 +27,7 @@ pub async fn desktop_events() -> Result<impl Stream<Item = LoopEvent>, BoxError>
 
     Ok(changes_stream.then(|msg| async move {
         let value = msg.get().await.expect("Error reading PowerSaveMode");
-        debug!("PowerSaveMode value: {value}");
+        trace!("PowerSaveMode value: {value}");
 
         // https://github.com/jadahl/gnome-monitor-config/blob/04b854e6411cd9ca75582c108aea63ae3c202f0e/src/org.gnome.Mutter.DisplayConfig.xml#L255-L283
         // - 0: on
