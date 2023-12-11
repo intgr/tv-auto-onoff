@@ -10,34 +10,21 @@ use futures::StreamExt;
 use futures::{executor, select};
 use futures_time::stream::interval;
 use futures_time::time::Duration;
-use log::{debug, trace, LevelFilter};
-use simple_logger::SimpleLogger;
-use time::macros::format_description;
-use time::util::local_offset;
-use time::util::local_offset::Soundness;
+use log::{debug, trace};
 
 use crate::desktop_idle::desktop_events;
+use crate::logging::init_logging;
 use crate::tv_manager::TvManager;
 use crate::util::BoxError;
 
 mod bravia;
 mod desktop_idle;
+mod logging;
 mod tv_manager;
 mod util;
 
 fn main() {
-    // time-rs is silly...
-    unsafe { local_offset::set_soundness(Soundness::Unsound) };
-
-    SimpleLogger::new()
-        .with_local_timestamps()
-        .with_timestamp_format(format_description!(
-            "[year]-[month]-[day] [hour]:[minute]:[second].[subsecond digits:3]"
-        ))
-        .with_level(LevelFilter::Debug)
-        .with_colors(true)
-        .init()
-        .unwrap();
+    init_logging();
 
     debug!("Starting {} {}...", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 
