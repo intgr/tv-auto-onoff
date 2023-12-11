@@ -20,3 +20,18 @@ Note: This project is still very basic and only supports two interfaces:
 
 1. Check out this repository.
 2. Run `cargo run <tv-ip-address>`
+
+### Install persistently
+
+1. Check out this repository
+2. Update `TV_IP_ADDRESS=` in `varia/tv-auto-onoff.service`
+3. Run the following comands:
+
+```shell
+cargo install --path .
+mkdir -p ~/.config/systemd/user/
+cp varia/tv-auto-onoff.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable tv-auto-onoff.service
+systemctl --user start tv-auto-onoff.service
+```
