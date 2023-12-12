@@ -6,8 +6,9 @@ use std::net::IpAddr;
 use std::pin::pin;
 use std::str::FromStr;
 
+use futures::executor;
 use futures::StreamExt;
-use futures::{executor, select};
+use futures_concurrency::stream::Merge;
 use futures_time::stream::interval;
 use futures_time::time::Duration;
 use log::{debug, trace};
@@ -48,21 +49,20 @@ pub enum LoopEvent {
 const KEEPALIVE_INTERVAL: u64 = 600;
 
 async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
-    let mut keepalive_ping = interval(Duration::from_secs(KEEPALIVE_INTERVAL)).fuse();
-    let mut idle_monitor = pin!(desktop_events()
+    let idle_events = pin!(desktop_events()
         .await
-        .expect("Error monitoring desktop events on D-Bus")
-        .fuse());
+        .expect("Error monitoring desktop events on D-Bus"));
+
+    let keepalive_events =
+        interval(Duration::from_secs(KEEPALIVE_INTERVAL)).map(|_| LoopEvent::Keepalive);
+
+    let mut merged_events = (idle_events, keepalive_events).merge();
+
     let mut current_blanked: Option<bool> = None;
 
-    loop {
-        let item = select! {
-            item = idle_monitor.next() => item,
-            _item = keepalive_ping.next() => Some(LoopEvent::Keepalive),
-        };
-
+    while let Some(item) = merged_events.next().await {
         match item {
-            Some(LoopEvent::ScreenSaver(blanked)) => {
+            LoopEvent::ScreenSaver(blanked) => {
                 if current_blanked == Some(blanked) {
                     continue; // Nothing changed
                 }
@@ -75,7 +75,7 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
                     tv.turn_on();
                 }
             }
-            Some(LoopEvent::Keepalive) => {
+            LoopEvent::Keepalive => {
                 if current_blanked == Some(false) {
                     trace!("Keep-alive");
                     tv.keepalive();
@@ -83,11 +83,9 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
                     debug!("Skipping keep-alive while blanked");
                 }
             }
-            Some(LoopEvent::Noop) => {}
-            None => break,
+            LoopEvent::Noop => {}
         }
     }
 
-    // TODO should be error?
-    Ok(())
+    panic!("Events stream ended unexpectedly");
 }
