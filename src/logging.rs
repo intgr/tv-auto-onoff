@@ -28,7 +28,6 @@ pub fn connected_to_journal() -> bool {
     false
 }
 
-#[allow(clippy::module_name_repetitions)]
 pub fn init_logging() {
     // Omit log timestamps and colors when running under systemd.
     let builder = if connected_to_journal() {
