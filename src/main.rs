@@ -1,4 +1,6 @@
+#![warn(clippy::cargo)]
 #![warn(clippy::pedantic)]
+#![allow(clippy::module_name_repetitions)]
 
 use std::env;
 use std::iter::Iterator;
