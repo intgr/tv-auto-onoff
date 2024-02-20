@@ -1,20 +1,20 @@
 use futures::Stream;
 use futures::StreamExt;
 use log::{trace, warn};
-use zbus::{dbus_proxy, Connection};
+use zbus::{Connection, proxy};
 
-use crate::util::BoxError;
 use crate::LoopEvent;
+use crate::util::BoxError;
 
-// https://docs.rs/zbus/latest/zbus/attr.dbus_proxy.html
+// https://docs.rs/zbus/latest/zbus/attr.proxy.html
 // https://dbus2.github.io/zbus/client.html#watching-for-changes
-#[dbus_proxy(
+#[proxy(
     default_service = "org.gnome.Mutter.DisplayConfig",
     default_path = "/org/gnome/Mutter/DisplayConfig",
     interface = "org.gnome.Mutter.DisplayConfig"
 )]
 trait DisplayConfig {
-    #[dbus_proxy(property)]
+    #[zbus(property)]
     fn power_save_mode(&self) -> zbus::Result<i32>;
 }
 
