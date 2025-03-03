@@ -10,8 +10,8 @@ use std::str::FromStr;
 use std::time::Duration;
 
 use async_io::Timer;
-use futures::executor;
 use futures::StreamExt;
+use futures::executor;
 use futures_concurrency::stream::Merge;
 use log::{debug, trace};
 
@@ -51,9 +51,11 @@ pub enum LoopEvent {
 const KEEPALIVE_INTERVAL: u64 = 600;
 
 async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
-    let idle_events = pin!(desktop_events()
-        .await
-        .expect("Error monitoring desktop events on D-Bus"));
+    let idle_events = pin!(
+        desktop_events()
+            .await
+            .expect("Error monitoring desktop events on D-Bus")
+    );
 
     let keepalive_events =
         Timer::interval(Duration::from_secs(KEEPALIVE_INTERVAL)).map(|_| LoopEvent::Keepalive);

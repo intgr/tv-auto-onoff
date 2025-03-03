@@ -1,10 +1,10 @@
 use futures::Stream;
 use futures::StreamExt;
 use log::{trace, warn};
-use zbus::{proxy, Connection};
+use zbus::{Connection, proxy};
 
-use crate::util::BoxError;
 use crate::LoopEvent;
+use crate::util::BoxError;
 
 // https://docs.rs/zbus/latest/zbus/attr.proxy.html
 // https://dbus2.github.io/zbus/client.html#watching-for-changes
@@ -25,7 +25,7 @@ pub async fn desktop_events() -> Result<impl Stream<Item = LoopEvent>, BoxError>
     let display_config_proxy = DisplayConfigProxy::new(&connection).await?;
     let changes_stream = display_config_proxy.receive_power_save_mode_changed().await;
 
-    Ok(changes_stream.then(|msg| async move {
+    Ok(changes_stream.then(async |msg| {
         let value = msg.get().await.expect("Error reading PowerSaveMode");
         trace!("PowerSaveMode value: {value}");
 
