@@ -7,12 +7,12 @@ use std::iter::Iterator;
 use std::net::IpAddr;
 use std::pin::pin;
 use std::str::FromStr;
+use std::time::Duration;
 
+use async_io::Timer;
 use futures::executor;
 use futures::StreamExt;
 use futures_concurrency::stream::Merge;
-use futures_time::stream::interval;
-use futures_time::time::Duration;
 use log::{debug, trace};
 
 use crate::desktop_idle::desktop_events;
@@ -56,7 +56,7 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
         .expect("Error monitoring desktop events on D-Bus"));
 
     let keepalive_events =
-        interval(Duration::from_secs(KEEPALIVE_INTERVAL)).map(|_| LoopEvent::Keepalive);
+        Timer::interval(Duration::from_secs(KEEPALIVE_INTERVAL)).map(|_| LoopEvent::Keepalive);
 
     let mut merged_events = (idle_events, keepalive_events).merge();
 
