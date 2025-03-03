@@ -18,7 +18,7 @@ pub fn connected_to_journal() -> bool {
     if result != 0 {
         return false;
     }
-    return journal_stream.to_string_lossy() == format!("{}:{}", stat.st_dev, stat.st_ino);
+    journal_stream.to_string_lossy() == format!("{}:{}", stat.st_dev, stat.st_ino)
 }
 
 #[cfg(not(target_os = "linux"))]
