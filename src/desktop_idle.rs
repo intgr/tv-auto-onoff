@@ -1,10 +1,10 @@
 use futures::Stream;
 use futures::StreamExt;
 use log::{trace, warn};
-use zbus::{Connection, proxy};
+use zbus::{proxy, Connection};
 
-use crate::LoopEvent;
 use crate::util::BoxError;
+use crate::LoopEvent;
 
 // https://docs.rs/zbus/latest/zbus/attr.proxy.html
 // https://dbus2.github.io/zbus/client.html#watching-for-changes
