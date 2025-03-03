@@ -5,8 +5,6 @@ use std::{env, mem};
 use log::LevelFilter;
 use simple_logger::SimpleLogger;
 use time::macros::format_description;
-use time::util::local_offset;
-use time::util::local_offset::Soundness;
 
 /// Is current process directly connected to the systemd journal?
 /// Somewhat inspired by `systemd-journal-logger`.
@@ -33,9 +31,6 @@ pub fn init_logging() {
     let builder = if connected_to_journal() {
         SimpleLogger::new().without_timestamps()
     } else {
-        // time-rs is silly...
-        unsafe { local_offset::set_soundness(Soundness::Unsound) };
-
         SimpleLogger::new()
             .with_local_timestamps()
             .with_timestamp_format(format_description!(
