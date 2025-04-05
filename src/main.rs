@@ -1,6 +1,7 @@
 #![warn(clippy::cargo)]
 #![warn(clippy::pedantic)]
 #![allow(clippy::module_name_repetitions)]
+#![allow(clippy::multiple_crate_versions)]
 
 use std::env;
 use std::iter::Iterator;
@@ -72,7 +73,7 @@ async fn main_loop(tv: TvManager) -> Result<(), BoxError> {
                 }
                 current_blanked = Some(blanked);
 
-                debug!("Screen blanked: {:?}", blanked);
+                debug!("Screen blanked: {blanked:?}");
                 if blanked {
                     tv.turn_off();
                 } else {
