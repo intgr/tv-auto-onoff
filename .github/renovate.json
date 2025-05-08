@@ -1,0 +1,19 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 5am on saturday"]
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["cargo"],
+      "matchUpdateTypes": ["patch"],
+      "groupName": "Cargo patch",
+      "schedule": ["before 5am on saturday"]
+    }
+  ]
+}
