@@ -4,6 +4,8 @@
     "config:recommended",
     ":semanticCommits"
   ],
+  "rangeStrategy": "bump",
+  "semanticCommitType": "feat",
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["before 5am on saturday"]
