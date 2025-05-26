@@ -1,3 +1,5 @@
+set dotenv-load := true
+
 default: validate
 
 validate: fmt test clippy
@@ -10,6 +12,9 @@ test:
 
 fmt:
     cargo fmt -- --color=always --check
+
+run:
+    cargo run -- $TV_IP_ADDRESS
 
 install:
     cargo install --path .
