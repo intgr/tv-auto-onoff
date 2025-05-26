@@ -1,5 +1,7 @@
 # Dumb down your smart TV!
 
+[![Tests status](https://github.com/intgr/tv-auto-onoff/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/intgr/tv-auto-onoff/actions?query=workflow:Tests)
+
 Automatically power on/off TV like a computer display.
 
 * **On/off:** Observes computer's intended display power status and automatically turns on/off your smart TV
