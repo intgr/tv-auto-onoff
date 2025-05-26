@@ -45,3 +45,23 @@ pub async fn desktop_events() -> Result<impl Stream<Item = LoopEvent>, BoxError>
         }
     }))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use futures::executor::block_on;
+    use std::env;
+    use temp_env::with_var;
+
+    #[test]
+    fn test_invalid_dbus_address() {
+        let run_dir = env::var("XDG_RUNTIME_DIR").unwrap();
+        let address = format!("unix:path={run_dir}/no-such-bus");
+
+        with_var("DBUS_SESSION_BUS_ADDRESS", Some(address), || {
+            block_on(async {
+                assert!(desktop_events().await.is_err());
+            });
+        });
+    }
+}
