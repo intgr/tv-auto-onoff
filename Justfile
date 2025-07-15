@@ -5,10 +5,10 @@ default: validate
 validate: fmt test clippy
 
 clippy:
-    cargo clippy --color=always --all-targets --all-features -- -D warnings
+    cargo clippy --color=always --all-targets --all-features -- --no-deps -D warnings
 
 test:
-    cargo test
+    cargo test --color=always --all-targets
 
 fmt:
     cargo fmt -- --color=always --check

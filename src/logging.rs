@@ -14,7 +14,7 @@ pub fn connected_to_journal() -> bool {
         return false;
     };
     let mut stat: libc::stat = unsafe { mem::zeroed() };
-    let result = unsafe { libc::fstat(stdout().as_raw_fd(), &mut stat) };
+    let result = unsafe { libc::fstat(stdout().as_raw_fd(), &raw mut stat) };
     if result != 0 {
         return false;
     }
