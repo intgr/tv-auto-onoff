@@ -19,9 +19,9 @@ categories = ["accessibility"]
 async-io = "2.6.0"
 futures = "0.3.31"
 futures-concurrency = "7.6.3"
-libc = "0.2.175"
+libc = "0.2.177"
 log = { version = "0.4.28", features = ["std"] }
-simple-error = "0.3.1"
+simple-error = "0.3.2"
 simple_logger = "5.1.0"
 temp-env = "0.3.6"
 time = { version = "0.3.44" }
