@@ -1,0 +1,27 @@
+{
+  "extends": [
+    "mergeConfidence:all-badges",
+    "config:recommended",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(deps)",
+    ":semanticCommitScopeDisabled",
+  ],
+  "rangeStrategy": "bump",
+  "lockFileMaintenance": {
+    // Open PR to update lockfile every 1st day of month & automerge every 2nd
+    "enabled": true,
+    "automerge": true,
+    "automergeType": "pr",
+    "platformAutomerge": false,
+    "schedule": ["* * 1 * *"],
+    "automergeSchedule": ["* * 2 * *"],
+  },
+  "packageRules": [
+    {
+      // Ignore Cargo patch updates -- updated with lockfile maintenance
+      "matchManagers": ["cargo"],
+      "matchUpdateTypes": ["patch"],
+      "enabled": false,
+    },
+  ],
+}
