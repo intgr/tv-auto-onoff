@@ -22,7 +22,7 @@ futures-concurrency = "7.7.1"
 libc = "0.2.175"
 log = { version = "0.4.28", features = ["std"] }
 simple-error = "0.3.1"
-simple_logger = "5.1.0"
+simple_logger = "5.2.0"
 temp-env = "0.3.6"
 time = { version = "0.3.44" }
 zbus = "5.13.0"
